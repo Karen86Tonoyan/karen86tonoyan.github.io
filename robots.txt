@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://karentonoyan.github.io/sitemap.xml
