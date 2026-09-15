@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Karen Tonoyan | AI Security, ALFA Ecosystem, Agent Systems</title>
+<meta name="description" content="AI Security, agent systems i ALFA Ecosystem. Cerber Browser, Guardian, MONO i Tonoyan Filters — kontrola modeli AI, agentów i automatyzacji.">
+<meta name="author" content="Karen Tonoyan">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://karentonoyan.github.io/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Karen Tonoyan — AI Security, Agent Systems i ALFA Ecosystem">
+<meta property="og:description" content="Projektuję systemy bezpieczeństwa dla modeli AI, agentów autonomicznych i automatyzacji. ALFA Ecosystem — kontrola, filtrowanie, audyt i analiza ryzyka.">
+<meta property="og:url" content="https://karentonoyan.github.io/">
+<meta property="og:site_name" content="Karen Tonoyan — ALFA Ecosystem">
+<meta property="og:locale" content="pl_PL">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Karen Tonoyan — AI Security & ALFA Ecosystem">
+<meta name="twitter:description" content="AI Security, agent systems i ALFA Ecosystem. Kontrola modeli AI, agentów i automatyzacji.">
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Karen Tonoyan",
+  "url": "https://karentonoyan.github.io/",
+  "jobTitle": "AI Security Engineer",
+  "description": "Independent AI developer and researcher, creator of the ALFA Ecosystem",
+  "knowsAbout": ["AI Security", "Agent Systems", "Prompt Injection Defense", "AI Safety", "Model Routing", "Autonomous Agents"],
+  "sameAs": [
+    "https://karentonoyan.pl"
+  ],
+  "worksFor": {
+    "@type": "Organization",
+    "name": "ALFA Ecosystem",
+    "description": "Wielowarstwowa architektura bezpieczeństwa dla modeli AI, agentów i narzędzi"
+  }
+}
+</script>
+
+<style>
+:root {
+  --gold: #d4a843;
+  --gold-light: #f0d68a;
+  --gold-dim: #8a6d2b;
+  --bg: #0a0a0a;
+  --bg-card: #111;
+  --bg-card2: #161616;
+  --text: #e8e0d0;
+  --text-dim: #8a8070;
+  --text-body: #c4baa8;
+  --red: #e74c3c;
+  --green: #2ecc71;
+  --blue: #3498db;
+  --purple: #9b59b6;
+  --orange: #e67e22;
+  --cyan: #1abc9c;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+}
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,10,10,0.95);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(212,168,67,0.2);
+  padding:0 24px;
+}
+.nav-inner{
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;
+  height:60px;gap:12px;
+}
+.nav-logo{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid var(--gold);
+}
+.nav-brand{
+  font-size:1rem;font-weight:700;
+  color:var(--gold);letter-spacing:1.5px;
+  flex:1;
+}
+.nav-links{display:flex;gap:24px;list-style:none;}
+.nav-links a{
+  color:var(--text-dim);text-decoration:none;
+  font-size:0.8rem;font-weight:500;
+  letter-spacing:0.5px;text-transform:uppercase;
+  transition:color 0.2s;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);}
+.nav-toggle{display:none;background:none;border:none;color:var(--gold);font-size:1.5rem;cursor:pointer;}
+.hero{
+  min-height:85vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:80px 24px 60px;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(212,168,67,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 30%, rgba(155,89,182,0.04) 0%, transparent 50%),
+    var(--bg);
+  text-align:center;
+}
+.hero-content{max-width:800px;}
+.hero-avatar{
+  width:120px;height:120px;border-radius:50%;
+  border:3px solid var(--gold);
+  box-shadow:0 0 30px rgba(212,168,67,0.25);
+  margin-bottom:28px;
+  object-fit:cover;
+}
+.hero h1{
+  font-size:2.2rem;
+  color:var(--gold-light);
+  font-weight:700;
+  line-height:1.3;
+  margin-bottom:20px;
+}
+.hero h1 span{color:var(--text);}
+.hero-lead{
+  font-size:1.05rem;
+  color:var(--text-body);
+  max-width:680px;
+  margin:0 auto 32px;
+  line-height:1.7;
+}
+.hero-ctas{
+  display:flex;gap:16px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:32px;
+}
+.cta-primary{
+  background:linear-gradient(135deg,var(--gold-dim),var(--gold));
+  color:#0a0a0a;
+  padding:14px 32px;border-radius:8px;
+  font-weight:700;font-size:0.9rem;
+  text-decoration:none;text-transform:uppercase;
+  letter-spacing:1px;
+  transition:opacity 0.2s,transform 0.2s;
+}
+.cta-primary:hover{opacity:0.9;transform:translateY(-1px);}
+.cta-secondary{
+  border:1px solid var(--gold-dim);
+  color:var(--gold);
+  padding:14px 32px;border-radius:8px;
+  font-weight:600;font-size:0.9rem;
+  text-decoration:none;text-transform:uppercase;
+  letter-spacing:1px;
+  transition:border-color 0.2s,color 0.2s;
+  background:transparent;
+}
+.cta-secondary:hover{border-color:var(--gold);color:var(--gold-light);}
+.hero-tagline{
+  font-size:0.9rem;
+  color:var(--text-dim);
+  font-style:italic;
+  margin-bottom:16px;
+}
+.hero-sub{
+  font-size:0.8rem;
+  color:var(--text-dim);
+  max-width:600px;
+  margin:0 auto;
+  line-height:1.6;
+}
+section{padding:80px 24px;}
+.section-inner{max-width:1100px;margin:0 auto;}
+.section-title{
+  font-size:1.5rem;font-weight:700;
+  color:var(--gold-light);
+  margin-bottom:12px;
+  text-align:center;
+}
+.section-lead{
+  font-size:0.95rem;
+  color:var(--text-body);
+  text-align:center;
+  max-width:700px;
+  margin:0 auto 48px;
+  line-height:1.7;
+}
+.tiles{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:20px;
+}
+.tile{
+  background:var(--bg-card);
+  border:1px solid #222;
+  border-radius:12px;
+  padding:28px 24px;
+  transition:border-color 0.3s,box-shadow 0.3s,transform 0.3s;
+}
+.tile:hover{
+  border-color:var(--gold-dim);
+  box-shadow:0 4px 24px rgba(212,168,67,0.1);
+  transform:translateY(-2px);
+}
+.tile-icon{
+  font-size:2rem;margin-bottom:16px;
+  display:block;
+}
+.tile h3{
+  font-size:1.1rem;font-weight:700;
+  color:var(--gold);
+  margin-bottom:10px;
+}
+.tile p{
+  font-size:0.85rem;
+  color:var(--text-body);
+  line-height:1.6;
+}
+.eco-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:16px;
+}
+.eco-item{
+  background:var(--bg-card2);
+  border:1px solid #1e1e1e;
+  border-radius:10px;
+  padding:20px;
+  transition:border-color 0.2s;
+}
+.eco-item:hover{border-color:var(--gold-dim);}
+.eco-name{
+  font-size:0.95rem;font-weight:700;
+  color:var(--gold);
+  margin-bottom:6px;
+}
+.eco-desc{
+  font-size:0.8rem;
+  color:var(--text-dim);
+  line-height:1.5;
+}
+.eco-tag{
+  display:inline-block;
+  font-size:0.65rem;
+  padding:2px 8px;
+  border-radius:10px;
+  margin-top:8px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+.tag-core{background:rgba(212,168,67,0.15);color:var(--gold);}
+.tag-security{background:rgba(231,76,60,0.15);color:var(--red);}
+.tag-filter{background:rgba(155,89,182,0.15);color:var(--purple);}
+.tag-browser{background:rgba(52,152,219,0.15);color:var(--blue);}
+.tag-compress{background:rgba(26,188,156,0.15);color:var(--cyan);}
+.bio-section{
+  display:flex;gap:40px;
+  align-items:flex-start;
+  max-width:900px;
+  margin:0 auto;
+}
+.bio-img{
+  width:160px;height:160px;
+  border-radius:12px;
+  border:2px solid var(--gold-dim);
+  object-fit:cover;
+  flex-shrink:0;
+  box-shadow:0 0 20px rgba(212,168,67,0.15);
+}
+.bio-text h3{
+  font-size:1.2rem;color:var(--gold-light);
+  margin-bottom:12px;
+}
+.bio-text p{
+  font-size:0.88rem;
+  color:var(--text-body);
+  margin-bottom:12px;
+  line-height:1.7;
+}
+.contact-row{
+  display:flex;gap:20px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.contact-card{
+  background:var(--bg-card);
+  border:1px solid #222;
+  border-radius:10px;
+  padding:20px 28px;
+  text-align:center;
+  min-width:200px;
+  transition:border-color 0.2s;
+}
+.contact-card:hover{border-color:var(--gold-dim);}
+.contact-card .label{
+  font-size:0.7rem;color:var(--text-dim);
+  text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:6px;
+}
+.contact-card .value{
+  font-size:0.9rem;color:var(--gold-light);
+  font-weight:600;
+}
+.contact-card a{color:var(--gold-light);text-decoration:none;}
+.contact-card a:hover{text-decoration:underline;}
+footer{
+  border-top:1px solid #1e1e1e;
+  padding:32px 24px;
+  text-align:center;
+}
+footer p{font-size:0.7rem;color:var(--text-dim);}
+footer a{color:var(--gold-dim);text-decoration:none;}
+@media(max-width:768px){
+  .nav-links{display:none;}
+  .nav-toggle{display:block;}
+  .nav-links.open{
+    display:flex;flex-direction:column;
+    position:absolute;top:60px;left:0;right:0;
+    background:rgba(10,10,10,0.98);
+    padding:20px 24px;gap:16px;
+    border-bottom:1px solid var(--gold-dim);
+  }
+  .hero h1{font-size:1.6rem;}
+  .hero{min-height:auto;padding:60px 16px 40px;}
+  .bio-section{flex-direction:column;align-items:center;text-align:center;}
+  .tiles{grid-template-columns:1fr;}
+  .eco-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <img class="nav-logo" id="navLogo" alt="ALFA">
+    <span class="nav-brand">ALFA ECOSYSTEM</span>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+    <ul class="nav-links">
+      <li><a href="#start" class="active">Start</a></li>
+      <li><a href="#uslugi">Usługi</a></li>
+      <li><a href="#ecosystem">Ecosystem</a></li>
+      <li><a href="#o-mnie">O mnie</a></li>
+      <li><a href="monitor.html">Monitor</a></li>
+      <li><a href="#kontakt">Kontakt</a></li>
+    </ul>
+  </div>
+</nav>
+<section class="hero" id="start">
+  <div class="hero-content">
+    <img class="hero-avatar" id="heroAvatar" alt="Karen Tonoyan">
+    <h1>Karen Tonoyan <span>— AI Security, Agent Systems i ALFA Ecosystem</span></h1>
+    <p class="hero-lead">Projektuję i rozwijam systemy bezpieczeństwa dla modeli AI, agentów autonomicznych i automatyzacji. ALFA łączy warstwy kontroli, filtrowania, audytu, przeglądania źródeł, zarządzania narzędziami i analizy ryzyka w jeden spójny ekosystem.</p>
+    <div class="hero-ctas">
+      <a href="#ecosystem" class="cta-primary">Poznaj ALFA Ecosystem</a>
+      <a href="#uslugi" class="cta-secondary">Zobacz systemy bezpieczeństwa</a>
+    </div>
+    <p class="hero-tagline">AI, które nie tylko działa — ale działa pod kontrolą.</p>
+    <p class="hero-sub">ALFA CORE, Cerber Browser, Guardian, Łasuch, MONO i Tonoyan Adaptive Filters tworzą wielowarstwową architekturę dla modeli, agentów i narzędzi AI.</p>
+  </div>
+</section>
+<section id="uslugi" style="background:var(--bg-card);">
+  <div class="section-inner">
+    <h2 class="section-title">Co mogę dla Ciebie zbudować</h2>
+    <p class="section-lead">Od audytu bezpieczeństwa AI po warstwę kontroli dla agentów i modeli. Projektuję rozwiązania obejmujące routing modeli, filtrowanie promptów, kontrolę tool-call, analizę źródeł, monitoring driftu, przeglądarki dla agentów oraz automatyzację z audytem i politykami dostępu.</p>
+    <div class="tiles">
+      <div class="tile">
+        <span class="tile-icon">&#128737;</span>
+        <h3>AI Security Layer</h3>
+        <p>Ochrona przed prompt injection, data leakage, tool abuse i błędnymi decyzjami agentów. Wielowarstwowe filtrowanie i audyt w czasie rzeczywistym.</p>
+      </div>
+      <div class="tile">
+        <span class="tile-icon">&#129302;</span>
+        <h3>Agent Systems</h3>
+        <p>Budowa agentów z kontrolą uprawnień, pamięcią, narzędziami i audytem. Pełna transparentność działań i śledzenie autorstwa kodu.</p>
+      </div>
+      <div class="tile">
+        <span class="tile-icon">&#128274;</span>
+        <h3>Private AI Infrastructure</h3>
+        <p>Lokalne modele, routing providerów, sandbox, proxy i kontrola danych. Infrastruktura AI pod pełną kontrolą właściciela.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="ecosystem">
+  <div class="section-inner">
+    <h2 class="section-title">ALFA Ecosystem</h2>
+    <p class="section-lead">Wielowarstwowa architektura bezpieczeństwa i kontroli dla modeli AI, agentów autonomicznych i narzędzi automatyzacji.</p>
+    <div class="eco-grid">
+      <div class="eco-item">
+        <div class="eco-name">ALFA CORE</div>
+        <div class="eco-desc">Centralny hub orchestracji — routing modeli, zarządzanie kontekstem, polityki dostępu i audyt operacji agentów.</div>
+        <span class="eco-tag tag-core">Core</span>
+      </div>
+      <div class="eco-item">
+        <div class="eco-name">Cerber Browser</div>
+        <div class="eco-desc">Przeglądarka bezpieczeństwa dla agentów AI — izolacja, sandboxing, kontrola źródeł i filtrowanie połączeń.</div>
+        <span class="eco-tag tag-browser">Browser</span>
+      </div>
+      <div class="eco-item">
+        <div class="eco-name">Guardian</div>
+        <div class="eco-desc">Strażnik uprawnień agentów — kontrola tool-call, monitoring działań, polityki bezpieczeństwa w czasie rzeczywistym.</div>
+        <span class="eco-tag tag-security">Security</span>
+      </div>
+      <div class="eco-item">
+        <div class="eco-name">Łasuch</div>
+        <div class="eco-desc">Asystent kulinarny AI — przepisy, planowanie posiłków, analiza składników z kontrolą jakości i preferencji.</div>
+        <span class="eco-tag tag-core">App</span>
+      </div>
+      <div class="eco-item">
+        <div class="eco-name">MONO</div>
+        <div class="eco-desc">Semantyczna kompresja tokenów — redukcja kosztów API przy zachowaniu pełnej treści i kontekstu komunikacji.</div>
+        <span class="eco-tag tag-compress">Compression</span>
+      </div>
+      <div class="eco-item">
+        <div class="eco-name">Tonoyan Adaptive Filters</div>
+        <div class="eco-desc">Framework anty-halucynacyjny — filtrowanie odpowiedzi modeli, scoring wiarygodności, detekcja driftu semantycznego.</div>
+        <span class="eco-tag tag-filter">Filters</span>
+      </div>
+    </div>
+  </div>
+</section>
+<section style="background:var(--bg-card);">
+  <div class="section-inner">
+    <h2 class="section-title">AI Security</h2>
+    <p class="section-lead">Systemy bezpieczeństwa zaprojektowane od zera pod modele AI i agentów autonomicznych.</p>
+    <div class="eco-grid">
+      <div class="eco-item">
+        <div class="eco-name">TAFE</div>
+        <div class="eco-desc">Tonoyan Adaptive Filter Engine — silnik filtrowania promptów z adaptacją do kontekstu i historii konwersacji.</div>
+        <span class="eco-tag tag-filter">Engine</span>
+      </div>
+      <div class="eco-item">
+        <div class="eco-name">Benchmark Lab</div>
+        <div class="eco-desc">Laboratorium testowe — porównywanie modeli AI pod kątem bezpieczeństwa, halucynacji, compliance i wydajności.</div>
+        <span class="eco-tag tag-security">Testing</span>
+      </div>
+      <div class="eco-item">
+        <div class="eco-name">Agent Security</div>
+        <div class="eco-desc">Warstwa bezpieczeństwa dla agentów autonomicznych — kontrola uprawnień, audit trail, izolacja i monitoring.</div>
+        <span class="eco-tag tag-security">Security</span>
+      </div>
+      <div class="eco-item">
+        <div class="eco-name">Prompt Injection Defense</div>
+        <div class="eco-desc">Ochrona przed atakami prompt injection i tool abuse — detekcja, blokowanie i raportowanie prób manipulacji.</div>
+        <span class="eco-tag tag-security">Defense</span>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="o-mnie">
+  <div class="section-inner">
+    <h2 class="section-title">O mnie</h2>
+    <div class="bio-section">
+      <img class="bio-img" id="bioAvatar" alt="Karen Tonoyan">
+      <div class="bio-text">
+        <h3>Karen Tonoyan — AI Security Engineer i twórca ALFA Ecosystem</h3>
+        <p>Niezależny badacz i deweloper AI z Legionowa, Polska. Twórca ALFA Ecosystem — wielowarstwowej architektury bezpieczeństwa dla modeli AI, agentów autonomicznych i systemów automatyzacji.</p>
+        <p>Projektuję rozwiązania łączące kontrolę, filtrowanie, audyt i analizę ryzyka. Moje systemy — ALFA CORE, Cerber Browser, Guardian, MONO i Tonoyan Adaptive Filters — adresują realne problemy bezpieczeństwa AI w produkcji.</p>
+        <p>Doświadczenie obejmujące służbę wojskową, profesjonalną fotografię i samodzielne badania nad psychologią stosowaną pozwoliło mi zbudować unikalne podejście do projektowania systemów AI — zorientowane na człowieka, przejrzyste i odporne na manipulację.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="kontakt" style="background:var(--bg-card);">
+  <div class="section-inner">
+    <h2 class="section-title">Kontakt</h2>
+    <p class="section-lead">Zainteresowany współpracą w zakresie AI Security, agent systems lub ALFA Ecosystem?</p>
+    <div class="contact-row">
+      <div class="contact-card">
+        <div class="label">Email</div>
+        <div class="value"><a href="mailto:kontakt@karentonoyan.pl">kontakt@karentonoyan.pl</a></div>
+      </div>
+      <div class="contact-card">
+        <div class="label">Strona</div>
+        <div class="value"><a href="https://karentonoyan.pl" target="_blank" rel="noopener">karentonoyan.pl</a></div>
+      </div>
+      <div class="contact-card">
+        <div class="label">Lokalizacja</div>
+        <div class="value">Legnica, Polska</div>
+      </div>
+    </div>
+  </div>
+</section>
+<footer>
+  <p>Karen Tonoyan &copy; 2026 &bull; ALFA Ecosystem &bull; AI Security &bull; Agent Systems</p>
+  <p style="margin-top:8px;"><a href="monitor.html">ALFA Agent Monitor</a> &bull; <a href="https://karentonoyan.pl">karentonoyan.pl</a></p>
+</footer>
+<script>
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const t = document.querySelector(a.getAttribute('href'));
+    if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+    document.querySelector('.nav-links').classList.remove('open');
+  });
+});
+const sections = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  sections.forEach(s => {
+    if(window.scrollY >= s.offsetTop - 100) cur = s.id;
+  });
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+  });
+});
+</script>
+<script>
+(function() {
+  var el;
+  el = document.getElementById('navLogo'); if(el) el.src = 'img/logo.png';
+  el = document.getElementById('heroAvatar'); if(el) el.src = 'img/avatar.png';
+  el = document.getElementById('bioAvatar'); if(el) el.src = 'img/avatar.png';
+})();
+</script>
+</body>
+</html>
