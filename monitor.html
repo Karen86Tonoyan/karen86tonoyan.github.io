@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ALFA Agent Monitor — Authorship Guard | Karen Tonoyan</title>
+<meta name="description" content="ALFA Agent Monitor — śledzenie autorstwa kodu, analiza commitów human vs AI, monitoring multi-platform (Claude, GPT, Copilot, Gemini, Qwen). Authorship Guard by Karen Tonoyan.">
+<meta name="author" content="Karen Tonoyan">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://karentonoyan.github.io/monitor.html">
+<meta property="og:title" content="ALFA Agent Monitor — Authorship Guard">
+<meta property="og:description" content="Śledzenie autorstwa kodu, analiza commitów human vs AI, monitoring agentów na wielu platformach.">
+<meta property="og:url" content="https://karentonoyan.github.io/monitor.html">
+<style>
+:root {
+  --gold: #d4a843;
+  --gold-light: #f0d68a;
+  --gold-dim: #8a6d2b;
+  --bg: #0a0a0a;
+  --bg-card: #141414;
+  --bg-card-hover: #1a1a1a;
+  --text: #e8e0d0;
+  --text-dim: #8a8070;
+  --red: #e74c3c;
+  --green: #2ecc71;
+  --blue: #3498db;
+  --purple: #9b59b6;
+  --orange: #e67e22;
+  --cyan: #1abc9c;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.header {
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1208 50%, #0d0d0d 100%);
+  border-bottom: 1px solid var(--gold-dim);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-logo {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 12px rgba(212,168,67,0.3);
+}
+.header-title { flex: 1; }
+.header-title h1 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+.header-title .subtitle {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+.header-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dim);
+  object-fit: cover;
+}
+.header-date {
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+.header-date .day { color: var(--gold-light); font-weight: 600; }
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 20px rgba(212,168,67,0.08);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.card-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gold-light);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.card-wide { grid-column: span 2; }
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.stat-box {
+  background: rgba(212,168,67,0.05);
+  border: 1px solid rgba(212,168,67,0.15);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+.stat-val {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1.2;
+}
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+.platform-list { list-style: none; }
+.platform-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #1e1e1e;
+}
+.platform-item:last-child { border-bottom: none; }
+.platform-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.platform-name {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.platform-bar-wrap {
+  flex: 2;
+  height: 6px;
+  background: #222;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.platform-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+.platform-pct {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  min-width: 40px;
+  text-align: right;
+}
+.platform-status {
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  min-width: 50px;
+  text-align: center;
+}
+.status-active { background: rgba(46,204,113,0.15); color: var(--green); }
+.status-idle { background: rgba(138,128,112,0.15); color: var(--text-dim); }
+.commit-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 120px;
+  padding-top: 10px;
+}
+.commit-day {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  height: 100%;
+  justify-content: flex-end;
+}
+.commit-bar-group {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  flex: 1;
+  width: 100%;
+}
+.commit-bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+  transition: height 0.4s ease;
+}
+.commit-bar.human { background: var(--gold); }
+.commit-bar.ai { background: var(--purple); }
+.commit-label {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+.commit-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  justify-content: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 2px;
+}
+.model-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #1e1e1e;
+}
+.model-row:last-child { border-bottom: none; }
+.model-name {
+  flex: 1;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.model-score {
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 36px;
+  text-align: right;
+}
+.model-stars {
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+.score-high { color: var(--green); }
+.score-mid { color: var(--gold); }
+.score-low { color: var(--red); }
+.feed-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #1e1e1e;
+}
+.feed-item:last-child { border-bottom: none; }
+.feed-time {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  min-width: 48px;
+  padding-top: 2px;
+}
+.feed-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.feed-text {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  flex: 1;
+}
+.feed-text strong { color: var(--gold-light); font-weight: 600; }
+.pie-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 10px 0;
+}
+.pie {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  position: relative;
+}
+.pie-labels { font-size: 0.8rem; }
+.pie-label-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.pie-swatch {
+  width: 12px; height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.footer {
+  text-align: center;
+  padding: 24px 16px;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  border-top: 1px solid #1e1e1e;
+  margin-top: 20px;
+}
+.footer a { color: var(--gold-dim); text-decoration: none; }
+@media (max-width: 720px) {
+  .card-wide { grid-column: span 1; }
+  .dashboard { grid-template-columns: 1fr; padding: 12px; }
+  .header { flex-wrap: wrap; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 8px rgba(212,168,67,0.2); }
+  50% { box-shadow: 0 0 16px rgba(212,168,67,0.4); }
+}
+.pulse { animation: pulse-gold 3s ease-in-out infinite; }
+.input-panel {
+  background: rgba(212,168,67,0.05);
+  border: 1px dashed var(--gold-dim);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 12px;
+}
+.input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.input-row input, .input-row select {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  flex: 1;
+  min-width: 100px;
+}
+.input-row input:focus, .input-row select:focus {
+  border-color: var(--gold);
+  outline: none;
+}
+.btn {
+  background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+  color: #0a0a0a;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: opacity 0.2s;
+}
+.btn:hover { opacity: 0.85; }
+.btn-sm { padding: 6px 14px; font-size: 0.7rem; }
+</style>
+</head>
+<body>
+<header class="header">
+  <img class="header-logo pulse" id="logo" alt="ALFA">
+  <div class="header-title">
+    <h1>ALFA AGENT MONITOR</h1>
+    <div class="subtitle">Authorship Guard &bull; Multi-Platform AI Tracking &bull; <a href="index.html" style="color:var(--gold-dim);text-decoration:none;">← Strona główna</a></div>
+  </div>
+  <div class="header-date">
+    <div class="day" id="currentDay"></div>
+    <div id="currentDate"></div>
+  </div>
+  <img class="header-avatar" id="avatar" alt="KT">
+</header>
+<main class="dashboard">
+  <div class="card card-wide">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(212,168,67,0.15);">&#9889;</div>
+      <div class="card-title">Podsumowanie dnia</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-val" id="totalCommits">47</div>
+        <div class="stat-label">Commity</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="humanPct">62%</div>
+        <div class="stat-label">Human</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="aiPct">38%</div>
+        <div class="stat-label">AI-Assisted</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="platformCount">5</div>
+        <div class="stat-label">Platformy</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="topModel">Opus</div>
+        <div class="stat-label">Top Model</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="linesChanged">+2.4K</div>
+        <div class="stat-label">Linii kodu</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(52,152,219,0.15);">&#128301;</div>
+      <div class="card-title">Platformy AI</div>
+    </div>
+    <ul class="platform-list" id="platformList">
+      <li class="platform-item">
+        <span class="platform-dot" style="background:var(--orange)"></span>
+        <span class="platform-name">Claude (Opus/Sonnet)</span>
+        <div class="platform-bar-wrap"><div class="platform-bar" style="width:85%;background:var(--orange)"></div></div>
+        <span class="platform-pct">85%</span>
+        <span class="platform-status status-active">ACTIVE</span>
+      </li>
+      <li class="platform-item">
+        <span class="platform-dot" style="background:var(--green)"></span>
+        <span class="platform-name">GPT-4o</span>
+        <div class="platform-bar-wrap"><div class="platform-bar" style="width:45%;background:var(--green)"></div></div>
+        <span class="platform-pct">45%</span>
+        <span class="platform-status status-active">ACTIVE</span>
+      </li>
+      <li class="platform-item">
+        <span class="platform-dot" style="background:var(--blue)"></span>
+        <span class="platform-name">GitHub Copilot</span>
+        <div class="platform-bar-wrap"><div class="platform-bar" style="width:60%;background:var(--blue)"></div></div>
+        <span class="platform-pct">60%</span>
+        <span class="platform-status status-active">ACTIVE</span>
+      </li>
+      <li class="platform-item">
+        <span class="platform-dot" style="background:var(--cyan)"></span>
+        <span class="platform-name">Google Gemini</span>
+        <div class="platform-bar-wrap"><div class="platform-bar" style="width:30%;background:var(--cyan)"></div></div>
+        <span class="platform-pct">30%</span>
+        <span class="platform-status status-idle">IDLE</span>
+      </li>
+      <li class="platform-item">
+        <span class="platform-dot" style="background:var(--purple)"></span>
+        <span class="platform-name">Qwen 3.5 (Ollama)</span>
+        <div class="platform-bar-wrap"><div class="platform-bar" style="width:20%;background:var(--purple)"></div></div>
+        <span class="platform-pct">20%</span>
+        <span class="platform-status status-active">ACTIVE</span>
+      </li>
+      <li class="platform-item">
+        <span class="platform-dot" style="background:var(--gold)"></span>
+        <span class="platform-name">KIMI K3 (Moonshot)</span>
+        <div class="platform-bar-wrap"><div class="platform-bar" style="width:15%;background:var(--gold)"></div></div>
+        <span class="platform-pct">15%</span>
+        <span class="platform-status status-idle">IDLE</span>
+      </li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(155,89,182,0.15);">&#128202;</div>
+      <div class="card-title">Authorship — 7 dni</div>
+    </div>
+    <div class="commit-chart" id="commitChart"></div>
+    <div class="commit-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> Human</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> AI-Assisted</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(46,204,113,0.15);">&#128272;</div>
+      <div class="card-title">Authorship Guard</div>
+    </div>
+    <div class="pie-container">
+      <div class="pie" id="authorshipPie"></div>
+      <div class="pie-labels">
+        <div class="pie-label-row">
+          <div class="pie-swatch" style="background:var(--gold)"></div>
+          <span>Karen (human): <strong>62%</strong></span>
+        </div>
+        <div class="pie-label-row">
+          <div class="pie-swatch" style="background:var(--orange)"></div>
+          <span>Claude: <strong>18%</strong></span>
+        </div>
+        <div class="pie-label-row">
+          <div class="pie-swatch" style="background:var(--green)"></div>
+          <span>GPT: <strong>8%</strong></span>
+        </div>
+        <div class="pie-label-row">
+          <div class="pie-swatch" style="background:var(--blue)"></div>
+          <span>Copilot: <strong>7%</strong></span>
+        </div>
+        <div class="pie-label-row">
+          <div class="pie-swatch" style="background:var(--purple)"></div>
+          <span>Local (Qwen): <strong>5%</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(231,76,60,0.15);">&#127942;</div>
+      <div class="card-title">Ocena modeli (dzienny)</div>
+    </div>
+    <div id="modelScores">
+      <div class="model-row">
+        <span class="model-name">Claude Opus 4.6</span>
+        <span class="model-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+        <span class="model-score score-high">9.4</span>
+      </div>
+      <div class="model-row">
+        <span class="model-name">Qwen 3.5 397B</span>
+        <span class="model-stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
+        <span class="model-score score-high">8.7</span>
+      </div>
+      <div class="model-row">
+        <span class="model-name">GPT-4o</span>
+        <span class="model-stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
+        <span class="model-score score-mid">8.2</span>
+      </div>
+      <div class="model-row">
+        <span class="model-name">GitHub Copilot</span>
+        <span class="model-stars">&#9733;&#9733;&#9733;&#9734;&#9734;</span>
+        <span class="model-score score-mid">7.5</span>
+      </div>
+      <div class="model-row">
+        <span class="model-name">KIMI K3</span>
+        <span class="model-stars">&#9733;&#9733;&#9733;&#9734;&#9734;</span>
+        <span class="model-score score-mid">7.1</span>
+      </div>
+      <div class="model-row">
+        <span class="model-name">Gemini 2.5 Pro</span>
+        <span class="model-stars">&#9733;&#9733;&#9733;&#9734;&#9734;</span>
+        <span class="model-score score-mid">6.8</span>
+      </div>
+      <div class="model-row">
+        <span class="model-name">DeepSeek V4 Flash</span>
+        <span class="model-stars">&#9733;&#9733;&#9734;&#9734;&#9734;</span>
+        <span class="model-score score-low">5.9</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(26,188,156,0.15);">&#128221;</div>
+      <div class="card-title">Aktywność — live feed</div>
+    </div>
+    <div id="activityFeed">
+      <div class="feed-item">
+        <span class="feed-time">23:42</span>
+        <span class="feed-dot" style="background:var(--orange)"></span>
+        <span class="feed-text"><strong>Claude Opus</strong> — commit: dashboard monitoring HTML</span>
+      </div>
+      <div class="feed-item">
+        <span class="feed-time">22:15</span>
+        <span class="feed-dot" style="background:var(--green)"></span>
+        <span class="feed-text"><strong>GPT-4o</strong> — review: ALFA Cloud Status docs</span>
+      </div>
+      <div class="feed-item">
+        <span class="feed-time">21:30</span>
+        <span class="feed-dot" style="background:var(--blue)"></span>
+        <span class="feed-text"><strong>Copilot</strong> — autocomplete: deploy/alfa-prod/</span>
+      </div>
+      <div class="feed-item">
+        <span class="feed-time">20:05</span>
+        <span class="feed-dot" style="background:var(--gold)"></span>
+        <span class="feed-text"><strong>Karen</strong> — manual commit: Qualtrics feedback form analysis</span>
+      </div>
+      <div class="feed-item">
+        <span class="feed-time">19:10</span>
+        <span class="feed-dot" style="background:var(--purple)"></span>
+        <span class="feed-text"><strong>Qwen 3.5</strong> — local analysis: commit provenance scan</span>
+      </div>
+      <div class="feed-item">
+        <span class="feed-time">18:22</span>
+        <span class="feed-dot" style="background:var(--cyan)"></span>
+        <span class="feed-text"><strong>KIMI K3</strong> — ai-chat.html session: API routing test</span>
+      </div>
+    </div>
+  </div>
+  <div class="card card-wide">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(212,168,67,0.15);">&#9998;</div>
+      <div class="card-title">Dodaj wpis / Log pracy</div>
+    </div>
+    <div class="input-panel">
+      <div class="input-row">
+        <select id="logPlatform">
+          <option value="claude">Claude</option>
+          <option value="gpt">GPT</option>
+          <option value="copilot">Copilot</option>
+          <option value="gemini">Gemini</option>
+          <option value="qwen">Qwen 3.5 (local)</option>
+          <option value="kimi">KIMI K3</option>
+          <option value="human">Human (manual)</option>
+        </select>
+        <select id="logType">
+          <option value="commit">Commit</option>
+          <option value="review">Code Review</option>
+          <option value="gen">Generation</option>
+          <option value="analysis">Analysis</option>
+          <option value="debug">Debug</option>
+          <option value="deploy">Deploy</option>
+        </select>
+        <input type="text" id="logDesc" placeholder="Opis pracy...">
+        <input type="number" id="logScore" placeholder="Ocena 1-10" min="1" max="10">
+        <button class="btn" onclick="addLogEntry()">Dodaj</button>
+      </div>
+    </div>
+    <div id="logHistory" style="margin-top:12px;max-height:200px;overflow-y:auto;"></div>
+  </div>
+</main>
+<footer class="footer">
+  ALFA Agent Monitor v0.1 &bull; Authorship Guard System &bull;
+  <a href="#">GitHub Pages</a> &bull;
+  Powered by ALFA Ecosystem &bull; Karen Tonoyan &copy; 2026
+</footer>
+<script>
+(function() {
+  const now = new Date();
+  const days = ['Niedziela','Poniedzia\u0142ek','Wtorek','\u015aroda','Czwartek','Pi\u0105tek','Sobota'];
+  const months = ['sty','lut','mar','kwi','maj','cze','lip','sie','wrz','pa\u017a','lis','gru'];
+  document.getElementById('currentDay').textContent = days[now.getDay()];
+  document.getElementById('currentDate').textContent =
+    now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+})();
+(function() {
+  const data = [
+    { day:'Pn', human:8, ai:5 },
+    { day:'Wt', human:12, ai:7 },
+    { day:'\u015ar', human:6, ai:9 },
+    { day:'Cz', human:10, ai:4 },
+    { day:'Pt', human:15, ai:8 },
+    { day:'So', human:4, ai:2 },
+    { day:'Nd', human:7, ai:3 },
+  ];
+  const maxVal = Math.max(...data.map(d => Math.max(d.human, d.ai)));
+  const chart = document.getElementById('commitChart');
+  data.forEach(d => {
+    const hPct = (d.human / maxVal * 100);
+    const aPct = (d.ai / maxVal * 100);
+    chart.innerHTML += '<div class="commit-day">' +
+      '<div class="commit-bar-group">' +
+      '<div class="commit-bar human" style="height:' + hPct + '%"><\/div>' +
+      '<div class="commit-bar ai" style="height:' + aPct + '%"><\/div>' +
+      '<\/div>' +
+      '<span class="commit-label">' + d.day + '<\/span>' +
+      '<\/div>';
+  });
+})();
+(function() {
+  const pie = document.getElementById('authorshipPie');
+  pie.style.background = 'conic-gradient(' +
+    'var(--gold) 0% 62%, ' +
+    'var(--orange) 62% 80%, ' +
+    'var(--green) 80% 88%, ' +
+    'var(--blue) 88% 95%, ' +
+    'var(--purple) 95% 100%)';
+  pie.style.boxShadow = '0 0 20px rgba(212,168,67,0.2)';
+})();
+const logEntries = [];
+function addLogEntry() {
+  const platform = document.getElementById('logPlatform').value;
+  const type = document.getElementById('logType').value;
+  const desc = document.getElementById('logDesc').value;
+  const score = document.getElementById('logScore').value;
+  if (!desc) return;
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2,'0') + ':' +
+               now.getMinutes().toString().padStart(2,'0');
+  const colors = {
+    claude:'var(--orange)', gpt:'var(--green)', copilot:'var(--blue)',
+    gemini:'var(--cyan)', qwen:'var(--purple)', kimi:'var(--gold)', human:'var(--gold-light)'
+  };
+  const names = {
+    claude:'Claude', gpt:'GPT-4o', copilot:'Copilot',
+    gemini:'Gemini', qwen:'Qwen 3.5', kimi:'KIMI K3', human:'Karen'
+  };
+  const entry = { platform, type, desc, score, time };
+  logEntries.unshift(entry);
+  const hist = document.getElementById('logHistory');
+  const html = '<div class="feed-item">' +
+    '<span class="feed-time">' + time + '<\/span>' +
+    '<span class="feed-dot" style="background:' + colors[platform] + '"><\/span>' +
+    '<span class="feed-text"><strong>' + names[platform] + '<\/strong> [' + type + '] \u2014 ' +
+    desc + (score ? ' (ocena: ' + score + '/10)' : '') + '<\/span><\/div>';
+  hist.innerHTML = html + hist.innerHTML;
+  const feed = document.getElementById('activityFeed');
+  feed.innerHTML = html + feed.innerHTML;
+  document.getElementById('logDesc').value = '';
+  document.getElementById('logScore').value = '';
+}
+async function loadDailyReport() {
+  try {
+    const resp = await fetch('data/daily-report.json');
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data.totalCommits) document.getElementById('totalCommits').textContent = data.totalCommits;
+      if (data.humanPct) document.getElementById('humanPct').textContent = data.humanPct + '%';
+      if (data.aiPct) document.getElementById('aiPct').textContent = data.aiPct + '%';
+      if (data.topModel) document.getElementById('topModel').textContent = data.topModel;
+      if (data.linesChanged) document.getElementById('linesChanged').textContent = data.linesChanged;
+    }
+  } catch(e) {}
+}
+loadDailyReport();
+</script>
+<script>
+(function() {
+  var el;
+  el = document.getElementById('logo'); if(el) el.src = 'img/logo.png';
+  el = document.getElementById('avatar'); if(el) el.src = 'img/avatar.png';
+})();
+</script>
+</body>
+</html>
